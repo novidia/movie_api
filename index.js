@@ -16,19 +16,33 @@ let topBooks = [
   },
 ];
 
-// GET requests
-app.get("/", (req, res) => {
-  res.send("Welcome to my book club!");
+let myLogger = (req, res, next) => {
+  console.log(req.url);
+  next();
+};
+
+let requestTime = (req, res, next) => {
+  req.requestTime = Date.now();
+  next();
+};
+
+app.use(myLogger);
+app.use(requestTime);
+
+app.get('/', (req, res) => {
+  let responseText = 'Welcome to my app!';
+  responseText += '<small>Requested at: ' + req.requestTime + '</small>';
+  res.send(responseText);
 });
 
-app.get("/documentation", (req, res) => {
-  res.sendFile("public/documentation.html", { root: __dirname });
-});
+app.get('/secreturl', (req, res) => {
+  let responseText = 'This is a secret url with super top-secret content.';
+  responseText += '<small>Requested at: ' + req.requestTime + '</small>';
+  res.send(responseText);
 
-app.get("/books", (req, res) => {
-  res.json(topBooks);
 });
 
 app.listen(8080, () => {
-  console.log("Your app is listening on port 8080.");
+  console.log('Your app is listening on port 8080.');
 });
+
